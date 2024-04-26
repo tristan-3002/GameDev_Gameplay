@@ -1,0 +1,47 @@
+// This script includes a basic Player class with health, score, and functions for taking damage, adding score, and handling game over.
+It also includes a simple main function with a sample gameplay loop.
+Remember to integrate this script within Unity following appropriate Unity-C++ integration procedures
+
+
+
+
+
+#include <iostream>
+#include <string>
+
+class Player {
+private:
+    int health;
+    int score;
+
+public:
+    Player() : health(100), score(0) {}
+
+    void TakeDamage(int damage) {
+        health -= damage;
+        if (health <= 0) {
+            GameOver();
+        }
+    }
+
+    void AddScore(int points) {
+        score += points;
+    }
+
+    void GameOver() {
+        std::cout << "Game Over! Your final score is: " << score << std::endl;
+        // Additional game over logic can be added here
+    }
+};
+
+int main() {
+    Player player;
+
+    // Sample gameplay loop
+    for (int i = 0; i < 10; i++) {
+        player.TakeDamage(10); // Player takes damage
+        player.AddScore(100);  // Player gains score
+    }
+
+    return 0;
+}
