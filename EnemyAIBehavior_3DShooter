@@ -1,0 +1,65 @@
+using UnityEngine;
+
+public class EnemyAIBehavior : MonoBehaviour
+{
+    public Transform[] waypoints;
+    public Transform player;
+    public float moveSpeed = 3f;
+    public float rotationSpeed = 2f;
+    public float detectionRange = 10f;
+    public float attackRange = 5f;
+
+    private int currentWaypointIndex = 0;
+    private bool isPlayerDetected = false;
+
+    void Start()
+    {
+        InvokeRepeating("Patrol", 0f, 1f);
+    }
+
+    void Update()
+    {
+        if (Vector3.Distance(transform.position, player.position) <= detectionRange)
+        {
+            isPlayerDetected = true;
+            CancelInvoke("Patrol");
+            ChasePlayer();
+        }
+        else
+        {
+            isPlayerDetected = false;
+            if (!IsInvoking("Patrol"))
+            {
+                InvokeRepeating("Patrol", 0f, 1f);
+            }
+        }
+    }
+
+    void Patrol()
+    {
+        if (waypoints.Length == 0)
+            return;
+
+        Transform targetWaypoint = waypoints[currentWaypointIndex];
+        transform.position = Vector3.MoveTowards(transform.position, targetWaypoint.position, moveSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, targetWaypoint.position) < 0.1f)
+        {
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+        }
+    }
+
+    void ChasePlayer()
+    {
+        Vector3 moveDirection = (player.position - transform.position).normalized;
+        transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+
+        Quaternion targetRotation = Quaternion.LookRotation(player.position - transform.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, player.position) <= attackRange)
+        {
+            // Engage in combat here (e.g., shoot the player)
+        }
+    }
+}
